@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOfficial() {
+      return request.auth != null
+        && request.auth.token.email in [
+          'chair@nscjsta.app',
+          'secretary@nscjsta.app',
+          'treasurer@nscjsta.app'
+        ];
+    }
+    // The whole register lives in one document: welfare/main
+    match /welfare/{doc} {
+      allow read, write: if isOfficial();
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
